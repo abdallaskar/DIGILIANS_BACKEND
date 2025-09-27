@@ -1,11 +1,23 @@
+// Config/db.js
 import mongoose from "mongoose";
 
-export const connectDB = async (MONGO_URI) => {
+let isConnected = false; // track the connection
+
+export const connectDB = async () => {
+    if (isConnected) {
+        return;
+    }
+
     try {
-        await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+        const conn = await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+
+        isConnected = conn.connections[0].readyState;
         console.log("✅ MongoDB Connected");
     } catch (err) {
         console.error("❌ MongoDB Error:", err.message);
-        process.exit(1);
+        throw new Error("Database connection failed");
     }
 };
