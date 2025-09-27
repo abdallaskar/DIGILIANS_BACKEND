@@ -1,15 +1,15 @@
-// Config/db.js
+
 import mongoose from "mongoose";
 
 let isConnected = false; // track the connection
 
-export const connectDB = async () => {
+export const connectDB = async (MONGO_URI) => {
     if (isConnected) {
         return;
     }
 
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
+        const conn = await mongoose.connect(MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
