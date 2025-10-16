@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../Config/JwtConfig.js";
 
 
 const userSchema = new mongoose.Schema({
@@ -21,6 +22,12 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 }
+
+// Method to generate JWT token
+userSchema.methods.generateAuthToken = function () {
+    const payload = { id: this._id, role: this.role };
+    return generateToken(payload);
+};
 
 
 const User = mongoose.model("User", userSchema);

@@ -1,33 +1,58 @@
-
+// controllers/authController.js
 import { serviceLogin, serviceRegister } from "../services/authService.js";
 
-// Login controller
+// LOGIN CONTROLLER
 export const login = async (req, res, next) => {
-    // Login logic here
-    const { email, password } = req.body;
-    // You can add your authentication logic here
-    if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
-    }
-    const result = await serviceLogin(email, password);
-    if (result.error) {
-        return next(result.error);
-    } else {
-        return res.status(200).json({ message: "Login successful" });
-    }
-}
+    try {
+        console.log(req.body);
+        const { email, password } = req.body;
+        if (!email || !password)
+            return res.status(400).json({ message: "Email and password are required" });
 
+        const result = await serviceLogin(email, password);
+        if (result.error) return res.status(401).json({ message: result.error.message });
 
-// Register controller
-export const register = async (req, res) => {
-    const { userName, email, password } = req.body;
+        const { user, token } = result;
 
-    if (!userName || !email || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                name: user.userName,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        next(error);
     }
-    const result = await serviceRegister(userName, email, password);
-    if (result.error) {
-        return res.status(400).json({ message: result.error.message });
+};
+
+// REGISTER CONTROLLER
+export const register = async (req, res, next) => {
+    try {
+        const { name, email, password } = req.body;
+        if (!name || !email || !password)
+            return res.status(400).json({ message: "All fields are required" });
+
+        const result = await serviceRegister(name, email, password);
+        if (result.error)
+            return res.status(400).json({ message: result.error.message });
+
+        const { user, token } = result;
+
+        return res.status(201).json({
+            message: "User registered successfully",
+            token,
+            user: {
+                id: user._id,
+                name: user.userName,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        next(error);
     }
-    return res.status(201).json({ message: "User registered successfully" });
-}
+};
