@@ -4,6 +4,7 @@ import cors from "cors";
 
 import sheetRouter from "./routes/sheetRoutes.js";
 import authRouter from "./routes/authRoutes.js";
+import reportRouter from "./routes/reportRoutes.js";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
 
@@ -20,6 +21,8 @@ app.use(express.json());
 // Routes
 app.use("/api/sheets", sheetRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/reports", reportRouter);
+
 app.get("/", (req, res) => {
     res.send("API is running...");
 });
